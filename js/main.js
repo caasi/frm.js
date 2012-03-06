@@ -117,14 +117,14 @@
       };
       */
 
-      this.frame = function() {
-        if (arguments.length === 0) return (_frame + this.frameNumber) % this.frameNumber;
-        else _frame = arguments[0];
+      this.frame = function(n) {
+        if ($.isNumeric(n)) _frame = Math.floor((n + this.frameNumber) % this.frameNumber);
+        return _frame;
       };
 
-      this.orientation = function() {
-        if (arguments.length === 0) return (_orientation + ORIENTATION_NUMBER) % ORIENTATION_NUMBER;
-        else _orientation = arguments[0];
+      this.orientation = function(o) {
+        if ($.isNumeric(o)) _orientation = Math.floor((o + ORIENTATION_NUMBER) % ORIENTATION_NUMBER);
+        return _orientation;
       };
 
       this.draw = function(context) {
@@ -141,7 +141,7 @@
 
         context.drawImage(
           frame.image,
-          this.x - frame.width / 2 + frame.offsetX + this.shiftX[this.orientation()],
+          this.x - Math.floor(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
           this.y - frame.height + frame.offsetY + this.shiftY[this.orientation()]
         );
       };
@@ -207,15 +207,25 @@
             context.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
 
             var computeOrientation = function(x, y) {
-              return Math.floor((Math.atan2(y - frameSet.y, x - frameSet.x) * 180 / Math.PI + 90) / 60);
+              return (Math.atan2(y - frameSet.y, x - frameSet.x) * 180 / Math.PI + 90) / 60;
             };
 
             $(globalCanvas).mousedown(function(e) {
               isMouseDown = true;
-              frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
+              var offset = $(this).offset();
+              var local = {
+                x: e.pageX - offset.left,
+                y: e.pageY - offset.top
+              };
+              frameSet.orientation(computeOrientation(local.x, local.y));
             }).mousemove(function(e) {
               if (isMouseDown) {
-                frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
+                var offset = $(this).offset();
+                var local = {
+                  x: e.pageX - offset.left,
+                  y: e.pageY - offset.top
+                };
+                frameSet.orientation(computeOrientation(local.x, local.y));
               }
             }).mouseup(function(e) {
               isMouseDown = false;
