@@ -118,12 +118,12 @@
       */
 
       this.frame = function(n) {
-        if ($.isNumeric(n)) _frame = Math.floor((n + this.frameNumber) % this.frameNumber);
+        if ($.isNumeric(n)) _frame = ~~((n + this.frameNumber) % this.frameNumber);
         return _frame;
       };
 
       this.orientation = function(o) {
-        if ($.isNumeric(o)) _orientation = Math.floor((o + ORIENTATION_NUMBER) % ORIENTATION_NUMBER);
+        if ($.isNumeric(o)) _orientation = ~~((o + ORIENTATION_NUMBER) % ORIENTATION_NUMBER);
         return _orientation;
       };
 
@@ -141,7 +141,7 @@
 
         context.drawImage(
           frame.image,
-          this.x - Math.floor(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
+          this.x - ~~(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
           this.y - frame.height + frame.offsetY + this.shiftY[this.orientation()]
         );
       };
