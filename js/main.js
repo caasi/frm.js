@@ -96,6 +96,11 @@
         this.frames[i] =  [];
         for (j = 0; j < this.frameNumber; ++j) {
           this.frames[i][j] = new Frame(data);
+          // fix offsets
+          if (j > 0) {
+            this.frames[i][j].offsetX += this.frames[i][j-1].offsetX;
+            this.frames[i][j].offsetY += this.frames[i][j-1].offsetY;
+          }
         }
       }
 
@@ -148,84 +153,91 @@
       palette: ko.observable(),
       src: ko.observable("./frm/_HMJMPSAA.FRM"),
       load: function() {
+        if (this.src().substr(-3, 3).toLowerCase() !== "frm") {
+          console.log("not a frm");
+          return;
+        }
+
         var xhr = new XMLHttpRequest();
         xhr.open("GET", this.src(), true);
         xhr.responseType = "arraybuffer";
-        xhr.onload = function(e) {
-          var i, j, k, x, y;
+        xhr.onreadystatechange = function(e) {
+          if (this.readyState === 4 && this.status === 200) {
+            var i, j, k, x, y;
 
-          /* clear timeout */
-          clearTimeout(timerID);
+            /* clear timeout */
+            clearTimeout(timerID);
 
-          /* prepare data */
-          var frm = new Uint8Array(this.response);
-          var frameSet = new FrameSet(new DataReader(frm));
+            /* prepare data */
+            var frm = new Uint8Array(this.response);
+            var frameSet = new FrameSet(new DataReader(frm));
 
-          /* create images */
-          var palette = page.palette();
+            /* create images */
+            var palette = page.palette();
 
-          for (i = 0; i < ORIENTATION_NUMBER; ++i) {
-            for (j = 0; j < frameSet.frameNumber; ++j) {
-              var frame = frameSet.frames[i][j];
-              var canvas = document.createElement("canvas");
-              canvas.width = frame.width;
-              canvas.height = frame.height;
-              var context = canvas.getContext("2d");
-              var image = context.createImageData(canvas.width, canvas.height);
+            for (i = 0; i < ORIENTATION_NUMBER; ++i) {
+              for (j = 0; j < frameSet.frameNumber; ++j) {
+                var frame = frameSet.frames[i][j];
+                var canvas = document.createElement("canvas");
+                canvas.width = frame.width;
+                canvas.height = frame.height;
+                var context = canvas.getContext("2d");
+                var image = context.createImageData(canvas.width, canvas.height);
 
-              for (y = 0; y < image.height; ++y) {
-                for (x = 0; x < image.width; ++x) {
-                  k = y * image.width + x;
-                  image.data[k * 4] = palette.R[frame.colorIndex[k]];
-                  image.data[k * 4 + 1] = palette.G[frame.colorIndex[k]];
-                  image.data[k * 4 + 2] = palette.B[frame.colorIndex[k]];
-                  image.data[k * 4 + 3] = frame.colorIndex[k] === 0 ? 0 : 255;
+                for (y = 0; y < image.height; ++y) {
+                  for (x = 0; x < image.width; ++x) {
+                    k = y * image.width + x;
+                    image.data[k * 4] = palette.R[frame.colorIndex[k]];
+                    image.data[k * 4 + 1] = palette.G[frame.colorIndex[k]];
+                    image.data[k * 4 + 2] = palette.B[frame.colorIndex[k]];
+                    image.data[k * 4 + 3] = frame.colorIndex[k] === 0 ? 0 : 255;
+                  }
                 }
+
+                context.putImageData(image, 0, 0);
+
+                frame.image = canvas;
               }
-
-              context.putImageData(image, 0, 0);
-
-              frame.image = canvas;
             }
-          }
 
-          var isMouseDown = false;
-          var globalCanvas = $("#canvas").get(0);
-          var context = globalCanvas.getContext("2d");
-          context.fillStyle = $(globalCanvas).css("background-color");
-          context.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
-
-          var computeOrientation = function(x, y) {
-            return Math.floor((Math.atan2(y - frameSet.y, x - frameSet.x) * 180 / Math.PI + 90) / 60);
-          };
-
-          $(globalCanvas).mousedown(function(e) {
-            isMouseDown = true;
-            frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
-          }).mousemove(function(e) {
-            if (isMouseDown) {
-              frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
-            }
-          }).mouseup(function(e) {
-            isMouseDown = false;
-          });
-
-          if (frameSet.fps === 0) frameSet.fps = 8;
-          frameSet.x = globalCanvas.width / 2;
-          frameSet.y = 3 * globalCanvas.height / 5;
-
-          var timeCallback = function() {
+            var isMouseDown = false;
+            var globalCanvas = $("#canvas").get(0);
+            var context = globalCanvas.getContext("2d");
+            context.fillStyle = $(globalCanvas).css("background-color");
             context.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
 
-            frameSet.draw(context);
-            frameSet.frame(frameSet.frame() + 1);
+            var computeOrientation = function(x, y) {
+              return Math.floor((Math.atan2(y - frameSet.y, x - frameSet.x) * 180 / Math.PI + 90) / 60);
+            };
 
-            timerID = setTimeout(function () {
-              timeCallback();
-            }, 1000 / frameSet.fps);
+            $(globalCanvas).mousedown(function(e) {
+              isMouseDown = true;
+              frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
+            }).mousemove(function(e) {
+              if (isMouseDown) {
+                frameSet.orientation(computeOrientation(e.offsetX, e.offsetY));
+              }
+            }).mouseup(function(e) {
+              isMouseDown = false;
+            });
+
+            if (frameSet.fps === 0) frameSet.fps = 8;
+            frameSet.x = globalCanvas.width / 2;
+            frameSet.y = 3 * globalCanvas.height / 5;
+
+            var timeCallback = function() {
+              context.fillRect(0, 0, globalCanvas.width, globalCanvas.height);
+
+              frameSet.draw(context);
+              frameSet.frame(frameSet.frame() + 1);
+
+              timerID = setTimeout(function () {
+                timeCallback();
+              }, 1000 / frameSet.fps);
+            };
+
+            timeCallback();
           };
-
-          timeCallback();
         };
         xhr.send();
       }
