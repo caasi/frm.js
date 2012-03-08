@@ -4,7 +4,7 @@
   var methods= {
     init: function(options) {
       var settings = $.extend({
-        "palette": "./frm/color.pal",
+        "palette": "./color.pal",
         "fps": 0,
         "width": 200,
         "height": 200,
