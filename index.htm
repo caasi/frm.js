@@ -3,13 +3,15 @@
   <head>
     <title>frm.js</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script type="text/javascript" src="./js/knockout-2.0.0.js"></script>
+    <script type="text/javascript" src="./js/file.js"></script>
+    <script type="text/javascript" src="./js/fallout.frm.js"></script>
+    <script type="text/javascript" src="./js/jquery.frmplayer.js"></script>
     <script type="text/javascript" src="./js/main.js"></script>
   </head>
   <body style="background-color: #333; padding-top: 200px; font-family: Monaco;">
-    <div style="width: 300px;margin: 0 auto; text-align: center;">
-      <canvas id="canvas" width="300" height="300" style="background-color: #222; border-radius: 8px;"></canvas><br/>
-      <input type="text" style="border: 1px solid #222; width: 240px; border-radius: 5px;" data-bind="visible: palette, value: src" /><button data-bind="visible: palette, click: load">load</button>
+    <div style="width: 410px;margin: 0 auto; text-align: center;">
+      <a class="frm" href="./frm/_HMJMPSAA.FRM">idle</a>
+      <a class="frm" href="./frm/_HMJMPSAB.FRM">walk</a>
       <p style="color: #EEE">drag mouse inside</p>
       <p style="color: #666; font-size: 10pt">powered by jQuery, knockout.js,<br/>and x'il, Pixote and Gr1m Reaper's Bald Dude</p>
     </div>
