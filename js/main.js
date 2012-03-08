@@ -2,7 +2,8 @@
   $(document).ready(function() {
     $("#frmplayer").frmplayer({
       width: 300,
-      height: 300
+      height: 300,
+      fps: 8
     });
 
     var $select = $("<select></select>");

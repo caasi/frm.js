@@ -55,6 +55,10 @@
             frameset.x = pos.x;
             frameset.y = pos.y;
             frameset.orientation(settings["orientation"]);
+            
+            if (settings["fps"]) {
+              frameset.fps = settings["fps"];
+            }
 
             var computeOrientation = function(x, y, origin) {
               return (Math.atan2(y - origin.y, x - origin.x) * 180 / Math.PI + 90) / 60;
