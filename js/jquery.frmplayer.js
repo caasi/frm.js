@@ -1,13 +1,14 @@
 (function($) {
   var palette = null;
 
-  var methods= {
+  var methods = {
     init: function(options) {
       var settings = $.extend({
         "palette": "./color.pal",
         "fps": 0,
         "width": 200,
         "height": 200,
+        "orientation": 2,
         "background-color": "#222",
         "border-radius": "8px",
         "prefPosition": function(width, height) {
@@ -20,20 +21,31 @@
 
       return this.each(function() {
         var $this = $(this);
-        var src = $this.attr("href");
-        var frm = new File();
-
+        $this.data("settings", settings);
+        
         var $canvas = $("<canvas width=\"" + settings.width + "\" height=\"" + settings.height + "\"></canvas>");
         $canvas.css("background-color", settings["background-color"]);
         $canvas.css("border-radius", settings["border-radius"]);
-        $this.data("canvas", $canvas);
-        $this.hide();
+
+        $this.data("$canvas", $canvas);
         $this.after($canvas);
+        $this.hide();
+
+        methods.load.apply($(this), [$this.attr("href")]);
+      });
+    },
+    load: function(url) {
+      return this.each(function() {
+        var $this = $(this);
+        var $canvas = $this.data("$canvas");
+        var settings = $this.data("settings");
+        
+        clearTimeout($this.data("tid"));
 
         var hasPalette = function() {
-          frm.open(src, function() {
+          var frm = new File();
+          frm.open(url, function() {
             var frameset = new FrameSet(frm, palette);
-            $this.data("frameset", frameset);
 
             var canvas = $canvas.get()[0];
             var context = canvas.getContext("2d");
@@ -42,6 +54,7 @@
             var pos = settings["prefPosition"](canvas.width, canvas.height);
             frameset.x = pos.x;
             frameset.y = pos.y;
+            frameset.orientation(settings["orientation"]);
 
             var computeOrientation = function(x, y, origin) {
               return (Math.atan2(y - origin.y, x - origin.x) * 180 / Math.PI + 90) / 60;
@@ -73,17 +86,19 @@
               context.fillRect(0, 0, canvas.width, canvas.height);
               frameset.draw(context);
               frameset.frame(frameset.frame() + 1);
-
-              setTimeout(function() {
+              
+              var tid = setTimeout(function() {
                 loop();
               }, 1000 / frameset.fps);
+
+              $this.data("tid", tid);
             };
 
             loop();
           });
         };
 
-        if (src.substr(-3, 3).toLowerCase() === "frm") {
+        if (url.substr(-3, 3).toLowerCase() === "frm") {
           if(palette) {
             hasPalette();
           } else {
