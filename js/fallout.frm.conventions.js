@@ -126,6 +126,8 @@ var FRMPostfixs = {
   "MH": "Rocket launcher aim",
   "MI": "Rocket launche pull down",
   "MJ": "Rocket launcher shot",
+  /* ?? */
+  "NA": "Called shot",
   /* Dead Bodies Animations */
   "RA": "Dead lying back",
   "RB": "Dead lying front",
@@ -190,7 +192,8 @@ var FRMPostfixs = {
   "PH": "Sniper aim",
   "PI": "Sniper pull down",
   "PJ": "Sniper shot",
-  "PK": "Sniper burst"
+  "PK": "Sniper burst",
+  "PP": "Sniper shot 2"
 };
 
 var FRMPrefixs = {
