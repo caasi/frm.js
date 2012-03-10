@@ -1,6 +1,8 @@
 <?php
-$dir = "./frm";
-$frms = scandir("./frm");
+$dir = "./frm/bald";
+#$dir = "./frm/rp/main/Appearance/HMR00S01/art/critters";
+#$dir = "./frm/rp/main/data/Art/critters";
+$frms = scandir($dir);
 $result = array();
 
 foreach ($frms as $filename) {
