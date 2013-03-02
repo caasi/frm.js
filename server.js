@@ -18,7 +18,9 @@ app.get("/js/list.js", function(req, res) {
   tmp = result["Hammering Richard"];
 
   fs.readdir(static_path + frm_path, function(err, files) {
-    files.forEach(function(value) {
+    files.sort(function(a, b) {
+      return a < b ? -1 : 1;
+    }).forEach(function(value) {
       var name, postfix;
       if (value.substr(-4, 4) === ".frm") {
         name = value.substr(0, value.length - 6);
