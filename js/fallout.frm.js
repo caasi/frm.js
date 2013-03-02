@@ -1,11 +1,7 @@
 var Palette;
-var Frame;
-var FrameSet;
+var FRM;
 
 (function(){
-  var UNSIGNED = File.UNSIGNED;
-  var SIGNED = File.SIGNED;
-
   Palette = function() {
     var i;
 
@@ -27,104 +23,102 @@ var FrameSet;
     }
   };
 
-  Frame = function(data, palette) {
-    var i, j, x, y;
+  FRM = {
+    ORIENTATION_NUMBER: 6,
+    create: function(url, success) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.responseType = "arraybuffer";
+      xhr.onreadystatechange = function(e) {
+        var i, j, k, x, y, frame, head, canvas, context, image;
+        var _frame = 0, _orientation = 2;
+        var result = {};
 
-    this.width =        data.readX(2, UNSIGNED);
-    this.height =       data.readX(2, UNSIGNED);
-    this.size =         data.readX(4, UNSIGNED);
-    this.offsetX =      data.readX(2, SIGNED);
-    this.offsetY =      data.readX(2, SIGNED);
+        if (this.readyState === 4 && this.status === 200) {
+          data_view = new DataView(this.response);
+          result.x = 0;
+          result.y = 0;
+          result.version =      data_view.getUint32(0x0000, false);
+          result.fps =          data_view.getUint16(0x0004, false);
+          result.actionFrame =  data_view.getUint16(0x0006, false);
+          result.frameNumber =  data_view.getUint16(0x0008, false);
+          result.size =         data_view.getUint32(0x003A, false);
+          result.shiftX = [];
+          result.shiftY = [];
+          result.offset = [];
+          result.frames = [];
+          for (i = 0; i < FRM.ORIENTATION_NUMBER; ++i) {
+            result.frames[i] = [];
+            result.shiftX[i] =  data_view.getInt16(0x000A + i * 2, false);
+            result.shiftY[i] =  data_view.getInt16(0x0016 + i * 2, false);
+            result.offset[i] =  data_view.getUint32(0x0022 + i * 4, false);
+            head = 0x003E + result.offset[i];
+            for (j = 0; j < result.frameNumber; ++j) {
+              frame = {};
+              frame.width =     data_view.getUint16(head, false);
+              frame.height =    data_view.getUint16(head + 2, false);
+              frame.size =      data_view.getUint32(head + 4, false);
+              frame.offsetX =   data_view.getInt16(head + 8, false);
+              frame.offsetY =   data_view.getInt16(head + 10, false);
+              frame.colorIndex = [];
+              for (k = 0; k < frame.size; ++k) {
+                frame.colorIndex[k] = data_view.getUint8(head + 12 + k);
+              }
 
-    this.colorIndex = [];
-    for (i = 0; i < this.size; ++i) {
-      this.colorIndex[i] = data.read(1, UNSIGNED);
-    }
+              /* create images */
+              canvas = document.createElement("canvas");
+              canvas.width = frame.width;
+              canvas.height = frame.height;
+              context = canvas.getContext("2d");
+              image = context.createImageData(canvas.width, canvas.height);
+              for (y = 0; y < image.height; ++y) {
+                for (x = 0; x < image.width; ++x) {
+                  k = y * image.width + x;
+                  image.data[k * 4] = palette_source[frame.colorIndex[k] * 3];
+                  image.data[k * 4 + 1] = palette_source[frame.colorIndex[k] * 3 + 1];
+                  image.data[k * 4 + 2] = palette_source[frame.colorIndex[k] * 3 + 2];
+                  image.data[k * 4 + 3] = frame.colorIndex[k] === 0 ? 0 : 255;
+                }
+              }
+              context.putImageData(image, 0, 0);
+              frame.image = canvas;
 
-    /* create images */
-    var canvas = document.createElement("canvas");
-    canvas.width = this.width;
-    canvas.height = this.height;
-    var context = canvas.getContext("2d");
-    var _image = context.createImageData(canvas.width, canvas.height);
+              result.frames[i][j] = frame;
 
-    for (y = 0; y < _image.height; ++y) {
-      for (x = 0; x < _image.width; ++x) {
-        j = y * _image.width + x;
-        _image.data[j * 4] = palette.R[this.colorIndex[j]];
-        _image.data[j * 4 + 1] = palette.G[this.colorIndex[j]];
-        _image.data[j * 4 + 2] = palette.B[this.colorIndex[j]];
-        _image.data[j * 4 + 3] = this.colorIndex[j] === 0 ? 0 : 255;
-      }
-    }
+              /* modify frame offset */
+              if (j > 0) {
+                result.frames[i][j].offsetX += result.frames[i][j - 1].offsetX;
+                result.frames[i][j].offsetY += result.frames[i][j - 1].offsetY;
+              }
 
-    context.putImageData(_image, 0, 0);
-    this.image = canvas;
-  };
+              head += frame.size + 12;
+            }
+          }
 
-  FrameSet = function(data, palette) {
-    var _frame = 0;
-    var _orientation = 2;
-    var i, j, k;
+          result.frame = function(n) {
+            if ($.isNumeric(n)) _frame = ~~((n + this.frameNumber) % this.frameNumber);
+            return _frame;
+          };
 
-    this.x = 0;
-    this.y = 0;
+          result.orientation = function(o) {
+            if ($.isNumeric(o)) _orientation = ~~((o + FRM.ORIENTATION_NUMBER) % FRM.ORIENTATION_NUMBER);
+            return _orientation;
+          };
 
-    this.version =      data.readX(4, UNSIGNED);
-    this.fps =          data.readX(2, UNSIGNED);
-    this.actionFrame =  data.readX(2, UNSIGNED);
-    this.frameNumber =  data.readX(2, UNSIGNED);
+          result.draw = function(context) {
+            var frame = this.frames[this.orientation()][this.frame()];
 
-    this.shiftX = [];
-    for (i = 0; i < FrameSet.ORIENTATION_NUMBER; ++i) {
-      this.shiftX[i] =  data.readX(2, SIGNED);
-    }
+            context.drawImage(
+              frame.image,
+              this.x - ~~(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
+              this.y - frame.height + frame.offsetY + this.shiftY[this.orientation()]
+            );
+          };
 
-    this.shiftY = [];
-    for (i = 0; i < FrameSet.ORIENTATION_NUMBER; ++i) {
-      this.shiftY[i] =  data.readX(2, SIGNED);
-    }
-
-    this.offset = [];
-    for (i = 0; i < FrameSet.ORIENTATION_NUMBER; ++i) {
-      this.offset[i] =  data.readX(4, UNSIGNED);
-    }
-
-    this.size =         data.readX(4, UNSIGNED);
-
-    this.frames = [];
-    for (i = 0; i < FrameSet.ORIENTATION_NUMBER; ++i) {
-      this.frames[i] =  [];
-      for (j = 0; j < this.frameNumber; ++j) {
-        this.frames[i][j] = new Frame(data, palette);
-        // fix offsets
-        if (j > 0) {
-          this.frames[i][j].offsetX += this.frames[i][j-1].offsetX;
-          this.frames[i][j].offsetY += this.frames[i][j-1].offsetY;
+          success(result);
         }
-      }
+      };
+      xhr.send();
     }
-
-    this.frame = function(n) {
-      if ($.isNumeric(n)) _frame = ~~((n + this.frameNumber) % this.frameNumber);
-      return _frame;
-    };
-
-    this.orientation = function(o) {
-      if ($.isNumeric(o)) _orientation = ~~((o + FrameSet.ORIENTATION_NUMBER) % FrameSet.ORIENTATION_NUMBER);
-      return _orientation;
-    };
-
-    this.draw = function(context) {
-      var frame = this.frames[this.orientation()][this.frame()];
-
-      context.drawImage(
-        frame.image,
-        this.x - ~~(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
-        this.y - frame.height + frame.offsetY + this.shiftY[this.orientation()]
-      );
-    };
   };
-
-  FrameSet.ORIENTATION_NUMBER = 6;
 })();

@@ -40,21 +40,19 @@
         clearTimeout($this.data("tid"));
 
         var hasPalette = function() {
-          var frm = new File();
-          frm.open(url, function() {
-            var frameset = new FrameSet(frm, palette);
-
+          /* new API */
+          FRM.create(url, function(frm) {
             var canvas = $canvas.get()[0];
             var context = canvas.getContext("2d");
             context.fillStyle = settings["background-color"];
 
             var pos = settings["prefPosition"](canvas.width, canvas.height);
-            frameset.x = pos.x;
-            frameset.y = pos.y;
-            frameset.orientation(settings["orientation"]);
+            frm.x = pos.x;
+            frm.y = pos.y;
+            frm.orientation(settings["orientation"]);
             
             if (settings["fps"]) {
-              frameset.fps = settings["fps"];
+              frm.fps = settings["fps"];
             }
 
             var computeOrientation = function(x, y, origin) {
@@ -69,7 +67,7 @@
                 x: e.pageX - offset.left,
                 y: e.pageY - offset.top
               };
-              frameset.orientation(computeOrientation(local.x, local.y, frameset));
+              frm.orientation(computeOrientation(local.x, local.y, frm));
             }).mousemove(function(e) {
               if (isMouseDown) {
                 var offset = $(this).offset();
@@ -77,7 +75,7 @@
                   x: e.pageX - offset.left,
                   y: e.pageY - offset.top
                 };
-                frameset.orientation(computeOrientation(local.x, local.y, frameset));
+                frm.orientation(computeOrientation(local.x, local.y, frm));
               }
             }).mouseup(function(e) {
               isMouseDown = false;
@@ -85,12 +83,12 @@
 
             var loop = function() {
               context.fillRect(0, 0, canvas.width, canvas.height);
-              frameset.draw(context);
-              frameset.frame(frameset.frame() + 1);
+              frm.draw(context);
+              frm.frame(frm.frame() + 1);
               
               var tid = setTimeout(function() {
                 loop();
-              }, 1000 / frameset.fps);
+              }, 1000 / frm.fps);
 
               $this.data("tid", tid);
             };
