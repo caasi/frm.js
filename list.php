@@ -1,7 +1,8 @@
 <?php
-$dir = "./frm/bald";
+#$dir = "./frm/bald";
 #$dir = "./frm/rp/main/Appearance/HMR00S01/art/critters";
 #$dir = "./frm/rp/main/data/Art/critters";
+$dir = "./frm/Hammering Richard/FRMs";
 $frms = scandir($dir);
 $result = array();
 

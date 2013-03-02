@@ -6,22 +6,24 @@ var FrameSet;
   var UNSIGNED = File.UNSIGNED;
   var SIGNED = File.SIGNED;
 
-  Palette = function(data) {
+  Palette = function() {
     var i;
 
+    /*
     var getColor = function(c) {
       if (c < 0 || c >= 64) c = 0;
       return c * 4;
     };
+    */
 
     this.R = [];
     this.G = [];
     this.B = [];
 
     for (i = 0; i < 256; ++i) {
-      this.R[i] = getColor(data.read(1, UNSIGNED));
-      this.G[i] = getColor(data.read(1, UNSIGNED));
-      this.B[i] = getColor(data.read(1, UNSIGNED));
+      this.R[i] = palette_source[i * 3];
+      this.G[i] = palette_source[i * 3 + 1];
+      this.B[i] = palette_source[i * 3 + 2];
     }
   };
 

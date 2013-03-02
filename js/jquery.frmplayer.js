@@ -1,10 +1,7 @@
 (function($) {
-  var palette = null;
-
   var methods = {
     init: function(options) {
       var settings = $.extend({
-        "palette": "./color.pal",
         "fps": 0,
         "width": 200,
         "height": 200,
@@ -103,15 +100,7 @@
         };
 
         if (url.substr(-3, 3).toLowerCase() === "frm") {
-          if(palette) {
-            hasPalette();
-          } else {
-            var pal = new File();
-            pal.open(settings.palette, function() {
-              palette = new Palette(pal);
-              hasPalette();
-            });
-          }
+          hasPalette();
         }
       });
     }
