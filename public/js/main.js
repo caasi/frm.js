@@ -15,7 +15,7 @@
       $.each(rest, function(appearance, rest) {
         appearance = appearance.toUpperCase();
         var readableAppearance = FRMAppearances[appearance] ? FRMAppearances[appearance] : appearance;
-        var $group = $("<optgroup label=\"" + readablePrefix + " in " + readableAppearance + "\"></optgroup>");
+        var $group = $("<optgroup label=\"" + readableAppearance + ", " + readablePrefix + "\"></optgroup>");
 
         $.each(rest, function(postfix, path) {
           postfix = postfix.toUpperCase();

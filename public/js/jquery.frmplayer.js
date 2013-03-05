@@ -97,7 +97,7 @@
           });
         };
 
-        if (url.substr(-3, 3).toLowerCase() === "frm") {
+        if (url.substr(-3, 2).toUpperCase() === "FR") {
           hasPalette();
         }
       });
