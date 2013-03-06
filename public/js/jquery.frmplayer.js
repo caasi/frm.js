@@ -7,7 +7,6 @@
         "height": 200,
         "orientation": 2,
         "background-color": "#222",
-        "border-radius": "8px",
         "prefPosition": function(width, height) {
           return {
             x: width / 2,
@@ -20,9 +19,7 @@
         var $this = $(this);
         $this.data("settings", settings);
         
-        var $canvas = $("<canvas width=\"" + settings.width + "\" height=\"" + settings.height + "\"></canvas>");
-        $canvas.css("background-color", settings["background-color"]);
-        $canvas.css("border-radius", settings["border-radius"]);
+        var $canvas = $("<canvas id=\"stage\" width=\"" + settings.width + "\" height=\"" + settings.height + "\"></canvas>");
 
         $this.data("$canvas", $canvas);
         $this.after($canvas);

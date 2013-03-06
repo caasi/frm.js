@@ -1,0 +1,32 @@
+doctype 5
+html
+  head
+    title frm.js
+    link(rel="stylesheet", href="./css/screen.css")
+  body
+    #wrap
+      a#frmplayer(href="./#{frms[0].path}")
+      #list
+        ul
+          - each frm in frms
+            li
+              a.frmlink(href="./#{frm.path}")
+                span.kind= frm.kind
+                span.appearance= frm.appearance
+                span.action= frm.action
+      p#loader
+        | progress:
+        span#loader
+      p#footer
+        | powered by
+        a(href="http://jquery.com/") jQuery
+        br/
+        | critters are come from
+        a(href="http://www.killap.net/") RB 2.1.2b
+        br/
+        a(href="https://github.com/caasi/frm.js") source
+    script(src="http://code.jquery.com/jquery-1.7.1.min.js")
+    script(src="./js/color.js")
+    script(src="./js/fallout.frm.js")
+    script(src="./js/jquery.frmplayer.js")
+    script(src="./js/main.js")
