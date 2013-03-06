@@ -6,7 +6,6 @@
         "width": 200,
         "height": 200,
         "orientation": 2,
-        "background-color": "#222",
         "prefPosition": function(width, height) {
           return {
             x: width / 2,
@@ -16,7 +15,13 @@
       }, options);
 
       return this.each(function() {
-        var $this = $(this);
+        var $this = $(this),
+            image;
+        settings["background-color"] = $this.css("background-color");
+        image = new Image();
+        // http://stackoverflow.com/questions/3098404/get-the-size-of-a-css-background-image-using-javascript
+        image.src = $this.css("background-image").replace(/url\(['"](.*)['"]\)/gi, '$1');
+        settings["background"] = image;
         $this.data("settings", settings);
         
         var $canvas = $("<canvas id=\"stage\" width=\"" + settings.width + "\" height=\"" + settings.height + "\"></canvas>");
@@ -79,6 +84,7 @@
             });
 
             var loop = function() {
+              context.drawImage(settings["background"], 0, 0);
               context.fillRect(0, 0, canvas.width, canvas.height);
               frm.draw(context);
               frm.frame(frm.frame() + 1);

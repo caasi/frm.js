@@ -1,6 +1,13 @@
+@font-face {
+  font-family: JH_Fallout;
+  src: url("../font/JH_FALLOUT.TTF");
+}
+
 body {
-  font-family: Manaco;
-  background-color: #333;
+  font-family: JH_Fallout;
+  font-size: 8pt;
+  color: #3CF800;
+  background-color: #101010;
   padding-top: 100px;
 }
 
@@ -14,7 +21,8 @@ body {
   float: left;
   width: 300px;
   height: 300px;
-  background-color: #222;
+  background-color: #040C00;
+  background: url("../img/arroyo.jpg");
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
 }
@@ -24,7 +32,7 @@ body {
   width: 500px;
   height: 300px;
   overflow: auto;
-  background-color: #222;
+  background-color: #040C00;
 }
 
 #list ul {
@@ -38,7 +46,8 @@ body {
 
 #list ul li a {
   display: block;
-  background-color: #272727;
+  color: #183018;
+  background-color: #040C00;
   height: 50px;
   line-height: 50px;
   width: 90%;
@@ -50,11 +59,16 @@ body {
 }
 
 #list ul li a:hover {
-  background-color: #2E2E2E;
+  color: #3CF800;
+  background-color: #143D00;
 }
 
 #list ul li a:active {
-  background-color: #666;
+  background-color: #206000;
+}
+
+#list ul li a.actived {
+  color: #3CF800;
 }
 
 #list ul li a span {
@@ -62,22 +76,17 @@ body {
 }
 
 .kind {
-  color: #999; 
 }
 
 .appearance {
-  color: #CCC;
 }
 
 .action {
-  color: #EEE;
 }
 
 #loader {
-  color: #EEE;
 }
 
 #footer {
-  font-size: 10pt;
-  color: #666;
+  font-size: 80%;
 }

@@ -10,21 +10,16 @@ html
         ul
           - each frm in frms
             li
-              a.frmlink(href="./#{frm.path}")
-                span.kind= frm.kind
-                span.appearance= frm.appearance
-                span.action= frm.action
+              - var classes = frm === frms[0] ? "frmlink actived" : "frmlink"
+                a(class=classes, href="./#{frm.path}")
+                  span.kind= frm.kind
+                  span.appearance= frm.appearance
+                  span.action= frm.action
       p#loader
         | progress:
         span#loader
       p#footer
-        | powered by
-        a(href="http://jquery.com/") jQuery
-        br/
-        | critters are come from
-        a(href="http://www.killap.net/") RB 2.1.2b
-        br/
-        a(href="https://github.com/caasi/frm.js") source
+        a(href="https://github.com/caasi/frm.js") github
     script(src="http://code.jquery.com/jquery-1.7.1.min.js")
     script(src="./js/color.js")
     script(src="./js/fallout.frm.js")
