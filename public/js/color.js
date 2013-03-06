@@ -1,4 +1,4 @@
-var palette_source = [
+var palette_fallback = [
    11,  0, 11,
   145, 64, 65,
     0,162,  0,
@@ -256,5 +256,3 @@ var palette_source = [
   189, 84, 83,
    11,  0, 11
 ];
-
-var palette = new Palette;

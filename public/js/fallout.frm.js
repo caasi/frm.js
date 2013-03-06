@@ -1,25 +1,43 @@
 var Palette;
+var PAL;
 var FRM;
 
 (function(){
-  Palette = function() {
-    var i;
+  var palette;
+  PAL = {
+    create: function(url, success) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url, true);
+      xhr.responseType = "arraybuffer";
+      xhr.onreadystatechange = function(e) {
+        var data_view, i, result;
 
-    /*
-    var getColor = function(c) {
-      if (c < 0 || c >= 64) c = 0;
-      return c * 4;
-    };
-    */
+        if (this.readyState === 4) {
+          result = [];
 
-    this.R = [];
-    this.G = [];
-    this.B = [];
+          if (this.status === 200) {
+            data_view = new DataView(this.response);
 
-    for (i = 0; i < 256; ++i) {
-      this.R[i] = palette_source[i * 3];
-      this.G[i] = palette_source[i * 3 + 1];
-      this.B[i] = palette_source[i * 3 + 2];
+            for (i = 0; i < 256; ++i) {
+              result[i] = {};
+              result[i].r = data_view.getUint8(i * 3) * 4;
+              result[i].g = data_view.getUint8(i * 3 + 1) * 4;
+              result[i].b = data_view.getUint8(i * 3 + 2) * 4;
+            }
+          } else if (this.status === 404) {
+            for (i = 0; i < 256; ++i) {
+              result[i] = {};
+              result[i].r = palette_fallback[i * 3];
+              result[i].g = palette_fallback[i * 3 + 1];
+              result[i].b = palette_fallback[i * 3 + 2];
+            }
+          }
+          
+          success(result);
+        }
+      };
+
+      xhr.send();
     }
   };
 
@@ -75,9 +93,9 @@ var FRM;
       for (y = 0; y < image.height; ++y) {
         for (x = 0; x < image.width; ++x) {
           k = y * image.width + x;
-          image.data[k * 4] = palette_source[frame.colorIndex[k] * 3];
-          image.data[k * 4 + 1] = palette_source[frame.colorIndex[k] * 3 + 1];
-          image.data[k * 4 + 2] = palette_source[frame.colorIndex[k] * 3 + 2];
+          image.data[k * 4] = palette[frame.colorIndex[k]].r;
+          image.data[k * 4 + 1] = palette[frame.colorIndex[k]].g;
+          image.data[k * 4 + 2] = palette[frame.colorIndex[k]].b;
           image.data[k * 4 + 3] = frame.colorIndex[k] === 0 ? 0 : 255;
         }
       }
@@ -149,6 +167,14 @@ var FRM;
     ORIENTATION_NUMBER: 6,
     create: function(url, success) {
       var i, result, tmp, xhr, source, data_view;
+
+      if (palette === undefined) {
+        PAL.create("./color.pal", function(pal) {
+          palette = pal;
+          FRM.create(url, success);
+        });
+        return;
+      }
 
       if ($.isNumeric(url[url.length - 1])) {
         result = {};
