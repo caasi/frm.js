@@ -45,6 +45,7 @@ body {
 }
 
 #list ul li a {
+  position: relative;
   display: block;
   color: #183018;
   background-color: #040C00;
@@ -84,9 +85,33 @@ body {
 .action {
 }
 
-#loader {
+.loader {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 30px;
+}
+
+.loader div {
+  float: right;
+  clear: right;
+  background-color: #3CF800;
+  height: 16.666%;
+  width: 0;
 }
 
 #footer {
-  font-size: 80%;
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+}
+
+#footer a {
+  color: #3CF800;
+  text-decoration: none;
+}
+
+#footer a:hover {
+  text-decoration: underline;
 }

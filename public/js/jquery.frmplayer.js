@@ -20,7 +20,7 @@
         settings["background-color"] = $this.css("background-color");
         image = new Image();
         // http://stackoverflow.com/questions/3098404/get-the-size-of-a-css-background-image-using-javascript
-        image.src = $this.css("background-image").replace(/url\(['"](.*)['"]\)/gi, '$1');
+        image.src = $this.css("background-image").replace(/url\((['"])?(.*)\1\)/gi, '$2');
         settings["background"] = image;
         $this.data("settings", settings);
         
@@ -33,7 +33,8 @@
         methods.load.apply($(this), [$this.attr("href")]);
       });
     },
-    load: function(url) {
+    load: function(url, progress) {
+      if (progress === undefined) progress = function() {};
       return this.each(function() {
         var $this = $(this);
         var $canvas = $this.data("$canvas");
@@ -97,10 +98,7 @@
             };
 
             loop();
-          }, function(files_total, files_current, loaded, total) {
-            var part = files_total === 1 ? "" : (files_current + 1) + " of " + files_total + " files: ";
-            $("#loader").text(part +  ~~(loaded / total * 100) + "%");
-          });
+          }, progress);
         };
 
         if (url.substr(-3, 2).toUpperCase() === "FR") {
