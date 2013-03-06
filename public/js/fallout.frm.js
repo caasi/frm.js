@@ -32,17 +32,26 @@ var FRM;
   };
 
   var frames_from_data_view_of_orientation = function (result, data_view, i) {
-    var j, k, frame, head, canvas, context, image;
+    var j,
+        k,
+        x,
+        y,
+        frameset,
+        frame,
+        prev_frame,
+        head,
+        canvas,
+        context,
+        image;
     
-    if (result.frames === undefined) result.frames = [];
-    if (result.shiftX === undefined) result.shiftX = [];
-    if (result.shiftY === undefined) result.shiftY = [];
-    if (result.offset === undefined) result.offset = [];
-    result.frames[i] = [];
-    result.shiftX[i] =  data_view.getInt16(0x000A + i * 2, false);
-    result.shiftY[i] =  data_view.getInt16(0x0016 + i * 2, false);
-    result.offset[i] =  data_view.getUint32(0x0022 + i * 4, false);
-    head = 0x003E + result.offset[i];
+    if (result.orientations === undefined) result.orientations = [];
+    frameset = result.orientations[i] = {};
+    frameset.frames = [];
+    frameset.shiftX =  data_view.getInt16(0x000A + i * 2, false);
+    frameset.shiftY =  data_view.getInt16(0x0016 + i * 2, false);
+    frameset.offset =  data_view.getUint32(0x0022 + i * 4, false);
+    head = 0x003E + frameset.offset;
+    prev_frame = null;
     for (j = 0; j < result.frameNumber; ++j) {
       frame = {};
       frame.width =     data_view.getUint16(head, false);
@@ -50,6 +59,8 @@ var FRM;
       frame.size =      data_view.getUint32(head + 4, false);
       frame.offsetX =   data_view.getInt16(head + 8, false);
       frame.offsetY =   data_view.getInt16(head + 10, false);
+      frame.offsetFixX = frame.offsetX + (prev_frame ? prev_frame.offsetFixX : 0);
+      frame.offsetFixY = frame.offsetY + (prev_frame ? prev_frame.offsetFixY : 0);
       frame.colorIndex = [];
       for (k = 0; k < frame.size; ++k) {
         frame.colorIndex[k] = data_view.getUint8(head + 12 + k);
@@ -73,14 +84,15 @@ var FRM;
       context.putImageData(image, 0, 0);
       frame.image = canvas;
 
-      result.frames[i][j] = frame;
+      frameset.frames[j] = frame;
 
       /* modify frame offset */
-      if (j > 0) {
-        result.frames[i][j].offsetX += result.frames[i][j - 1].offsetX;
-        result.frames[i][j].offsetY += result.frames[i][j - 1].offsetY;
+      if (prev_frame) {
+        frame.offsetX += prev_frame.offsetX;
+        frame.offsetY += prev_frame.offsetY;
       }
 
+      prev_frame = frame;
       head += frame.size + 12;
     }
   };
@@ -101,12 +113,13 @@ var FRM;
     };
 
     result.draw = function(context) {
-      var frame = this.frames[this.orientation()][this.frame()];
+      var frameset = this.orientations[this.orientation()],
+          frame = frameset.frames[this.frame()];
 
       context.drawImage(
         frame.image,
-        this.x - ~~(frame.width / 2) + frame.offsetX + this.shiftX[this.orientation()],
-        this.y - frame.height + frame.offsetY + this.shiftY[this.orientation()]
+        this.x - ~~(frame.width / 2) + frame.offsetX + frameset.shiftX,
+        this.y - frame.height + frame.offsetY + frameset.shiftY
       );
     };
   };
