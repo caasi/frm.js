@@ -3,17 +3,23 @@
   src: url("../font/JH_FALLOUT.TTF");
 }
 
+html {
+}
+
 body {
   font-family: JH_Fallout;
   font-size: 8pt;
   color: #3CF800;
   background-color: #101010;
-  padding-top: 100px;
 }
 
 #wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   width: 800px;
-  margin: 0 auto;
+  margin-top: -150px;
+  margin-left: -400px;
   text-align: center;
 }
 
@@ -103,8 +109,8 @@ body {
 
 #footer {
   position: absolute;
-  right: 10px;
-  bottom: 5px;
+  right: 0;
+  bottom: -4em;
 }
 
 #footer a {
