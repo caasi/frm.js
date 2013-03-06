@@ -142,7 +142,7 @@ var FRM;
     };
   };
 
-  var get_data_recursively = function(source, responses, from, to, success) {
+  var get_data_recursively = function(source, responses, from, to, success, progress) {
     var xhr;
 
     if (from >= to) {
@@ -156,22 +156,26 @@ var FRM;
     xhr.onreadystatechange = function(e) {
       if (this.readyState === 4 && this.status === 200) {
         responses[from] = this.response;
-        get_data_recursively(source, responses, from + 1, to, success);
+        get_data_recursively(source, responses, from + 1, to, success, progress);
       }
     };
-
+    xhr.addEventListener("progress", function(e) {
+      if (e.lengthComputable) {
+        progress(to, from, e.loaded, e.total);
+      }
+    }, false);
     xhr.send();
   };
 
   FRM = {
     ORIENTATION_NUMBER: 6,
-    create: function(url, success) {
+    create: function(url, success, progress) {
       var i, result, tmp, xhr, source, data_view;
 
       if (palette === undefined) {
         PAL.create("./color.pal", function(pal) {
           palette = pal;
-          FRM.create(url, success);
+          FRM.create(url, success, progress);
         });
         return;
       }
@@ -191,7 +195,7 @@ var FRM;
           form_FRM(result);
 
           success(result);
-        });
+        }, progress);
         
         return;
       }
@@ -216,6 +220,11 @@ var FRM;
           success(result);
         }
       };
+      xhr.addEventListener("progress", function(e) {
+        if (e.lengthComputable) {
+          progress(1, 0, e.loaded, e.total);
+        }
+      }, false);
       xhr.send();
     }
   };

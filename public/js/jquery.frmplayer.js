@@ -94,6 +94,9 @@
             };
 
             loop();
+          }, function(files_total, files_current, loaded, total) {
+            var part = files_total === 1 ? "" : (files_current + 1) + " of " + files_total + " files: ";
+            $("#loader").text(part +  ~~(loaded / total * 100) + "%");
           });
         };
 
