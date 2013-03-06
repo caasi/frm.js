@@ -10,7 +10,7 @@ Client side scripts for loading and rendering Fallout's FRM files.
 ## Thanks to
 
 *   Critters come from [Fallout 2 Restoration Project](http://www.killap.net/)
-*   [JH Fallout Font]  
+*   [JH Fallout Font](http://www.nma-fallout.com/forum/dload.php?action=file&file_id=16)  
     Warning: use this font will sale you soul to the author!
 *   NovaRain  
     The man who makes me love Fallout series deeper, and help me test this project.
@@ -21,4 +21,4 @@ Client side scripts for loading and rendering Fallout's FRM files.
 *   separate pure frm data from sprite
 *   cross domain request
 *   read frm without all 6 directions
-*   now it's a jQuery plugin, but it doesn't do much
+*   entend and clean up this jQuery plugin
