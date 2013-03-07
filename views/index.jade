@@ -2,12 +2,13 @@ doctype 5
 html
   head
     title frm.js
+    link(rel="stylesheet", href="./css/nanoscroller.css")
     link(rel="stylesheet", href="./css/screen.css")
   body
     #wrap
       a#frmplayer(href="./#{frms[0].path}")
-      #list
-        ul
+      #list.nano
+        ul.content
           - each frm in frms
             li
               - var classes = frm === frms[0] ? "frmlink actived" : "frmlink"
@@ -28,4 +29,5 @@ html
     script(src="./js/color.js")
     script(src="./js/fallout.frm.js")
     script(src="./js/jquery.frmplayer.js")
+    script(src="./js/jquery.nanoscroller.min.js")
     script(src="./js/main.js")

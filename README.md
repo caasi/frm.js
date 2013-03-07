@@ -6,6 +6,7 @@ Client side scripts for loading and rendering Fallout's FRM files.
 *   [jQuery](http://jquery.com/) 1.7.1
 *   [Express](http://expressjs.com/)
 *   [Jade](http://jade-lang.com/)
+*   [nanoScroller.js](http://jamesflorentino.github.com/nanoScrollerJS/)
 
 ## Thanks to
 

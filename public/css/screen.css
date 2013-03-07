@@ -37,7 +37,6 @@ body {
   float: left;
   width: 500px;
   height: 300px;
-  overflow: auto;
   background-color: #040C00;
 }
 
@@ -121,3 +120,5 @@ body {
 #footer a:hover {
   text-decoration: underline;
 }
+
+.nano .pane { margin: 10px; }
